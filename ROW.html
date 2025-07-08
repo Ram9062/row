@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>R.O.W - RTO Office Work</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f9ff;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(to right, #005fa3, #0077cc);
+      color: white;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 {
+      font-size: 1.8em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header img {
+      height: 40px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      min-height: 100vh;
+      padding: 60px 40px;
+      gap: 40px;
+      background: white;
+    }
+
+    .left, .right {
+      flex: 1 1 45%;
+      padding: 20px;
+    }
+
+    .left h2 {
+      font-size: 2.5em;
+      color: #0077cc;
+      margin-bottom: 20px;
+    }
+
+    .left p {
+      font-size: 1.1em;
+      margin-bottom: 30px;
+      color: #444;
+    }
+
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .gallery-group {
+      border-top: 2px solid #0077cc;
+      padding-top: 20px;
+    }
+
+    .gallery-group h3 {
+      font-size: 1.4em;
+      color: #005fa3;
+      margin-bottom: 15px;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .image-wrapper {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .image-wrapper img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .image-info {
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .image-info .desc {
+      font-size: 0.95em;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .image-info .price {
+      font-size: 0.9em;
+    }
+
+    .cut-price {
+      color: #000000;
+      text-decoration: line-through;
+      margin-right: 8px;
+    }
+
+    .sale-price {
+      color: #d32f2f;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      background: #f0f0f0;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        padding: 30px 20px;
+      }
+
+      .left, .right {
+        flex: 1 1 100%;
+        padding: 10px;
+      }
+
+      .left h2 {
+        font-size: 2em;
+      }
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .modal-description {
+      font-size: 1em;
+      color: #333;
+    }
+
+    .modal-price {
+      margin-top: 10px;
+      font-size: 1.1em;
+    }
+
+    .modal-price .cut-price {
+      color: #000000;
+      text-decoration: line-through;
+      margin-right: 10px;
+    }
+
+    .modal-price .sale-price {
+      color: #d32f2f;
+      font-weight: bold;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 1.5em;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .close-modal:hover {
+      color: #333;
+    }
+
+    /* Floating Buttons */
+    .floating-buttons {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+.floating-buttons .icon.small {
+  color: #fff;
+  padding: 14px;
+  border-radius: 50%;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: 1.3em;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  animation: blink 1.4s infinite;
+}
+
+.floating-buttons .call-btn {
+  background-color: #e53935; /* red */
+}
+
+.floating-buttons .whatsapp-btn {
+  background-color: #25d366; /* WhatsApp green */
+}
+
+.floating-buttons .icon.small:hover {
+  transform: scale(1.15);
+  filter: brightness(1.2);
+}
+
+/* Blinking animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1> R.O.W</h1>
+    <span>RTO Office Work Service</span>
+  </header>
+
+  <div class="container">
+    <div class="left">
+      <h2>Welcome to R.O.W</h2>
+      <p>
+        We assist you with all RTO-related documentation including vehicle registration,
+        license services, transfer papers, and more. Our services are fast, reliable,
+        and hassle-free.
+      </p>
+
+     <div class="gallery">
+
+  <!-- License Services -->
+  <div class="gallery-group">
+    <h3>License Services</h3>
+    <div class="image-grid">
+
+      <div class="image-wrapper" data-desc="Time-1 month 15 days  ♦Online exam & test - 2600/-  ♦Without online exam & test must - 2900/-  ♦Without online exam & test - 5100/-  ♦Online exam fail - 150/-  ♦Test fail - 450/-" 
+
+data-cut="₹2800" data-price="₹2600">
+
+        <img src="L1.jpg" alt="Pic 1">
+        <div class="image-info">
+          <div class="desc">Two Wheeler License</div>
+
+          <div class="price"><span class="cut-price">₹2800</span><span class="sale-price">₹2600</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Time-1 month 15 days  ♦Online exam & test - 3100/-  ♦Without online exam & test must - 3400/-  ♦Without online exam & test - 5500/-  ♦Online exam fail - 150/-  ♦Test fail - 850/-" 
+
+data-cut="₹3400" data-price="₹3100">
+
+        <img src="L2.jpg" alt="Pic 2">
+        <div class="image-info">
+          <div class="desc">Four Wheeler License</div>
+          <div class="price"><span class="cut-price">₹3400</span><span class="sale-price">₹3100</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Time-1 month 15 days  ♦Online exam & test - 4700/-  ♦Without online exam & test must - 5000/-  ♦Without online exam & test - 6300/-" 
+
+data-cut="₹4700" data-price="₹4400">
+
+        <img src="L3.jpg" alt="Pic 3">
+        <div class="image-info">
+          <div class="desc">Two+Four Wheeler License</div>
+          <div class="price"><span class="cut-price">₹4700</span><span class="sale-price">₹4400</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Driving License Renewal" 
+
+data-cut="₹1800" data-price="₹1500">
+
+        <img src="L4.jpg" alt="Pic 4">
+        <div class="image-info">
+          <div class="desc">DL License Renewal</div>
+          <div class="price"><span class="cut-price">₹1800</span><span class="sale-price">₹1500</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Duplicate License Apply" data-cut="  " data-price="--">
+        <img src="L5.jpg" alt="Pic 5">
+        <div class="image-info">
+          <div class="desc">Duplicate License Apply</div>
+
+          <div class="price"><span class="cut-price">  </span><span class="sale-price">--</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Transport Vehicles drive permission" 
+
+data-cut="  " data-price="--">
+
+        <img src="L6.jpg" alt="Pic 6">
+        <div class="image-info">
+          <div class="desc"> CAB License</div>
+          <div class="price"><span class="cut-price">  </span><span class="sale-price">--</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle Services -->
+  <div class="gallery-group">
+    <h3>Vehicle Services</h3>
+    <div class="image-grid">
+      <div class="image-wrapper" data-desc="All Vehicles MV Tax Payment" 
+
+data-cut="₹1200" data-price="₹1000">
+
+        <img src="V1.jpg" alt="Pic 7">
+        <div class="image-info">
+          <div class="desc">All Vehicles MV Tax Payment</div>
+          <div class="price"><span class="cut-price">₹1200</span><span class="sale-price">₹1000</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Verification car all documents than payment" data-cut="  " data-price="--">
+        <img src="V2.jpg" alt="Pic 8">
+        <div class="image-info">
+          <div class="desc">Transfer of Ownership</div>
+          <div class="price"><span class="cut-price">  </span><span class="sale-price">--</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Verification car all documents than payment" data-cut="  " data-price="--">
+        <img src="V3.jpg" alt="Pic 9">
+        <div class="image-info">
+          <div class="desc">Vehicles CF Renewal</div>
+          <div class="price"><span class="cut-price">  </span><span class="sale-price">--</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="Vehicle Fitness Certificate" data-cut="₹2000" data-price="₹1700">
+        <img src="V4.jpg" alt="Pic 10">
+        <div class="image-info">
+          <div class="desc">Vehicle Fitness Certificate</div>
+          <div class="price"><span class="cut-price">₹2000</span><span class="sale-price">₹1700</span></div>
+        </div>
+      </div>
+
+      <div class="image-wrapper" data-desc="All Vehicles replacement old and break number plate and added HSRP number plate" data-cut="₹2500" data-price="₹2200">
+        <img src="V5.jpg" alt="Pic 11">
+        <div class="image-info">
+          <div class="desc">Replacement Number Plate</div>
+          <div class="price"><span class="cut-price">₹2500</span><span class="sale-price">₹2200</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+   <footer>
+    &copy; 2021 R.O.W - RTO Office Work by R.Sarkar. All rights reserved.
+  </footer>
+
+
+  <!-- ✅ Floating Call & WhatsApp Buttons -->
+  <div class="floating-buttons">
+    <a href="tel:+919748665475" class="icon small call-btn" title="Call Now">
+      <i class="fas fa-phone"></i>
+    </a>
+    <a href="https://wa.me/919748665475" class="icon small whatsapp-btn" title="WhatsApp Us" target="_blank">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+
+  <!-- Modal -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <img id="modalImg" src="" alt="">
+      <div class="modal-description" id="modalDesc"></div>
+      <div class="modal-price" id="modalPrice">
+        <span class="cut-price">₹0</span>
+        <span class="sale-price">₹0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Script -->
+  <script>
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalPrice = document.getElementById('modalPrice');
+    const closeBtn = document.querySelector('.close-modal');
+
+    document.querySelectorAll('.image-wrapper').forEach(wrapper => {
+      const img = wrapper.querySelector('img');
+      const desc = wrapper.getAttribute('data-desc') || 'No description';
+      const cutPrice = wrapper.getAttribute('data-cut') || '';
+      const salePrice = wrapper.getAttribute('data-price') || '';
+
+      img.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        modalImg.src = img.src;
+        modalImg.alt = img.alt;
+        modalDesc.textContent = desc;
+        modalPrice.innerHTML = `
+          <span class="cut-price">${cutPrice}</span>
+          <span class="sale-price">${salePrice}</span>
+        `;
+      });
+    });
+
+    closeBtn.onclick = () => {
+      modal.style.display = 'none';
+    };
+
+    window.onclick = (e) => {
+      if (e.target == modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+
+</body>
+</html>
